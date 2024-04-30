@@ -2,6 +2,7 @@ package http
 
 import (
 	"errors"
+	errs "github.com/behrouz-rfa/kentech/internal/core/errors"
 	"net/http"
 
 	"github.com/behrouz-rfa/kentech/internal/core/model"
@@ -36,6 +37,13 @@ func validationError(ctx *gin.Context, err error) {
 
 // handleError determines the status code of an error and returns a JSON response with the error message and status code
 func handleError(ctx *gin.Context, err error) {
+
+	e, ok := err.(*errs.HTTPError)
+	if ok {
+		ctx.AbortWithStatusJSON(e.Code, newErrorResponse([]string{e.Details}))
+		return
+	}
+
 	statusCode, ok := errorStatusMap[err]
 	if !ok {
 		statusCode = http.StatusInternalServerError
@@ -81,6 +89,14 @@ type errorResponse struct {
 
 // newErrorResponse is a helper function to create an error response body
 func newErrorResponse(errMsgs []string) errorResponse {
+	return errorResponse{
+		Success:  false,
+		Messages: errMsgs,
+	}
+}
+
+// newErrorResponse is a helper function to create an error response body
+func NewErrorResponse(errMsgs []string) errorResponse {
 	return errorResponse{
 		Success:  false,
 		Messages: errMsgs,

@@ -1,71 +1,67 @@
-package errors
+package errs
 
-import "errors"
-
-type ErrorType int64
-
-const (
-	ErrNotFound ErrorType = iota
-	ErrInvalidInput
-	ErrUnauthorized
-	ErrForbidden
-	ErrInternal
-	ErrConflict
-	ErrNotImplemented
-	ErrUnknown
+import (
+	"fmt"
+	"net/http"
 )
 
-type AppError interface {
-	Error() string
-	Code() string
+// HTTPError is an error that will be rendered to the client.
+type HTTPError struct {
+	Code              int               `json:"-"`
+	Message           string            `json:"original_message,omitempty"`
+	Details           string            `json:"details,omitempty"`
+	ExtraDetails      string            `json:"extraDetails,omitempty"`
+	ReferenceId       string            `json:"reference_id,omitempty"`
+	TranslationKey    string            `json:"-"`
+	TranslatedMessage string            `json:"message,omitempty"`
+	ValidationErrors  []ValidationError `json:"validation_errors"`
 }
 
-type Error struct {
-	error
-	Type ErrorType
-}
-
-func (e *Error) Error() string {
-	return e.error.Error()
-}
-
-func (e *Error) Code() string {
-	return Code(e.Type)
-}
-
-func Code(typ ErrorType) string {
-	switch typ {
-	case ErrNotFound:
-		return "not_found"
-	case ErrInvalidInput:
-		return "invalid_input"
-	case ErrUnauthorized:
-		return "unauthorized"
-	case ErrForbidden:
-		return "forbidden"
-	case ErrInternal:
-		return "internal"
-	case ErrConflict:
-		return "conflict"
-	case ErrNotImplemented:
-		return "not_implemented"
-	case ErrUnknown:
-		return "unknown"
-	default:
-		return "unknown"
+// New initializes new HTTPError
+func New(err error, code int, validationErrs ...ValidationError) *HTTPError {
+	if code <= 0 {
+		code = http.StatusInternalServerError
 	}
+
+	e := &HTTPError{
+		Code: code,
+	}
+	if err != nil {
+		e.Message = err.Error()
+	}
+
+	if len(validationErrs) > 0 {
+		e.ValidationErrors = validationErrs
+	}
+
+	return e
 }
 
-func Wrap(err error, typ ErrorType) *Error {
-	return &Error{
-		error: err,
-		Type:  typ,
-	}
+// Detail sets HTTPError Details
+func (e *HTTPError) Detail(details string) *HTTPError {
+	e.Details = details
+	return e
 }
 
-func WrapCustom(m string, typ ErrorType) *Error {
-	return &Error{
-		error: errors.New(m),
-		Type:  typ,
-	}
+// ReferenceID sets HTTPError ReferenceId
+func (e *HTTPError) ReferenceID(referenceID string) *HTTPError {
+	e.ReferenceId = referenceID
+	return e
+}
+
+// Key sets HTTPError TranslationKey
+func (e *HTTPError) Key(translationKey string) *HTTPError {
+	e.TranslationKey = translationKey
+	return e
+}
+
+// Error implements the error interface
+func (e *HTTPError) Error() string {
+	return fmt.Sprintf("handler: %v: %v %v", e.Code, e.Message, e.Details)
+}
+
+// Validations appends validation errors to HTTPError.ValidationErrors
+func (e *HTTPError) Validations(validations ...ValidationError) *HTTPError {
+	e.ValidationErrors = append(e.ValidationErrors, validations...)
+	return e
 }

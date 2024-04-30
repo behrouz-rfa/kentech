@@ -50,7 +50,9 @@ func (s *FilmService) GetFilm(ctx context.Context, filter filters.FilmBy) (*mode
 
 // GetFilms retrieves a list of films based on the specified filter, sort, and pagination options.
 func (s *FilmService) GetFilms(ctx context.Context, filter *filters.FilmFilter, sort *sort.FilmSort, paginate *pagination.Pagination) ([]*model.Film, error) {
-	spec := s.filmRepo.NewFilmSpecification(ctx).Filter(filter).SortBy(sort).(specification.FilmSpecification)
+	spec := s.filmRepo.NewFilmSpecification(ctx).
+		Filter(filter).
+		SortBy(sort).(specification.FilmSpecification)
 	return s.filmRepo.GetFilms(ctx, spec, paginate)
 }
 

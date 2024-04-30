@@ -69,7 +69,7 @@ func (s *MongoTestSuite) TestFilmUpdate() {
 	s.Require().NotEmpty(id, "id should not be empty")
 	s.Require().NotEqual(id, "", "id should not be equal to ``")
 
-	Title := "newMoview"
+	Title := "newMovie"
 
 	testCreateFilm := &model.FilmInput{
 		Title:       "Master",
@@ -87,7 +87,7 @@ func (s *MongoTestSuite) TestFilmUpdate() {
 	s.Require().NotEmpty(id, "id should not be empty")
 	s.Require().NotEqual(id, "", "id should not be equal to ``")
 	updateFilm := &model.FilmUpdateInput{
-		Title: Title,
+		Title: &Title,
 	}
 	// update name successfully
 	err = s.db.UpdateFilm(context.Background(), filmId, updateFilm)

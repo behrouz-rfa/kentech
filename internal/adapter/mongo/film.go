@@ -2,7 +2,6 @@ package mongo
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/behrouz-rfa/kentech/internal/adapter/mongo/mspecification"
@@ -35,7 +34,7 @@ func (u Film) ToModel() *model.Film {
 		Director:    u.Director,
 		ReleaseDate: u.ReleaseDate,
 		Cast:        u.Cast,
-		Genre:       u.Genre,
+		Genre:       model.Genre(u.Genre),
 		Synopsis:    u.Synopsis,
 		CreatorID:   u.CreatorID,
 	}
@@ -91,7 +90,8 @@ func (m Repository) UpdateFilm(ctx context.Context, id string, obj *model.FilmUp
 	_, err := col.UpdateOne(ctx, filter, bson.M{"$set": data})
 	if err != nil {
 		m.lg.WithError(err).Error("failed to update film")
-		return cerr.Wrap(err, cerr.ErrInternal)
+		return cerr.ErrInternalServerError.Detail("failed to update film")
+
 	}
 
 	return nil
@@ -105,12 +105,13 @@ func (m Repository) DeleteFilm(ctx context.Context, id string) error {
 	result, err := col.DeleteOne(ctx, filter)
 	if err != nil {
 		m.lg.WithError(err).Error("failed to delete film")
-		return cerr.Wrap(err, cerr.ErrInternal)
+		return cerr.ErrInternalServerError.Detail("failed to delete film")
+
 	}
 
 	if result.DeletedCount == 0 {
 		m.lg.WithError(err).Error("nothing found for delete")
-		return cerr.Wrap(errors.New("nothing found for delete"), cerr.ErrNotFound)
+		return cerr.ErrNotFound.Detail("nothing found for delete")
 	}
 
 	return nil

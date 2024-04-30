@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	errs "github.com/behrouz-rfa/kentech/internal/core/errors"
 	specification "github.com/behrouz-rfa/kentech/internal/core/specefication"
 
 	"github.com/behrouz-rfa/kentech/internal/core/model"
@@ -81,12 +82,17 @@ func (s *UserService) GetUsers(ctx context.Context, filter *filters.UserFilter, 
 // CreateUser creates a new user with the provided input.
 func (s *UserService) CreateUser(ctx context.Context, input *model.UserInput) (*model.User, error) {
 	existingUser, err := s.GetUser(ctx, filters.UserBy{Username: &input.Username})
-	if err != nil && err.Error() != "could not found" {
-		return nil, err
+	if err != nil {
+		if e, ok := err.(*errs.HTTPError); ok {
+			if e.Code != 404 {
+				return nil, err
+			}
+		}
+
 	}
 
 	if existingUser != nil {
-		return nil, fmt.Errorf("%w: user with username %s already exists", model.ErrConflictingData, input.Username)
+		return nil, errs.ErrBadRequest.Detail(fmt.Sprintf("%w: user with username %s already exists", model.ErrConflictingData, input.Username))
 	}
 
 	hashedPassword, err := util.HashPassword(input.Password)

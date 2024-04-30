@@ -3,8 +3,6 @@ package mongo
 import (
 	"context"
 	"encoding/json"
-	"errors"
-
 	cerr "github.com/behrouz-rfa/kentech/internal/core/errors"
 	"github.com/behrouz-rfa/kentech/internal/core/specefication"
 	"github.com/behrouz-rfa/kentech/pkg/logger"
@@ -49,7 +47,7 @@ func FindOneBy[Q, T any](ctx context.Context, params *FindByParams[Q, T]) (*T, e
 	}
 
 	if len(results) < 1 {
-		return nil, cerr.Wrap(errors.New("could not found"), cerr.ErrNotFound)
+		return nil, cerr.ErrNotFound.Detail("could not found")
 	}
 
 	return params.ToModel(results[0]), nil

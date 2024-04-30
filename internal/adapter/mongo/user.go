@@ -2,8 +2,6 @@ package mongo
 
 import (
 	"context"
-	"errors"
-
 	"github.com/behrouz-rfa/kentech/internal/adapter/mongo/mspecification"
 	"github.com/behrouz-rfa/kentech/internal/adapter/mongo/utils"
 	cerr "github.com/behrouz-rfa/kentech/internal/core/errors"
@@ -87,7 +85,8 @@ func (m Repository) UpdateUser(ctx context.Context, id string, obj *model.UserUp
 	_, err := col.UpdateOne(ctx, filter, bson.M{"$set": data})
 	if err != nil {
 		m.lg.WithError(err).Error("failed to update user")
-		return cerr.Wrap(err, cerr.ErrInternal)
+		return cerr.ErrInternalServerError.Detail("failed to update user")
+
 	}
 
 	return nil
@@ -101,12 +100,12 @@ func (m Repository) DeleteUser(ctx context.Context, id string) error {
 	result, err := col.DeleteOne(ctx, filter)
 	if err != nil {
 		m.lg.WithError(err).Error("failed to delete user")
-		return cerr.Wrap(err, cerr.ErrInternal)
+		return cerr.ErrInternalServerError.Detail("failed to delete user")
 	}
 
 	if result.DeletedCount == 0 {
 		m.lg.WithError(err).Error("nothing found for delete")
-		return cerr.Wrap(errors.New("nothing found for delete"), cerr.ErrNotFound)
+		return cerr.ErrNotFound.Detail("nothing found for delete")
 	}
 
 	return nil

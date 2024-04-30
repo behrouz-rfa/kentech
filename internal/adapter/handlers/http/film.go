@@ -102,13 +102,13 @@ func (h FilmHandler) GetFilm(ctx *gin.Context) {
 
 // updateFilmRequest represents the request body for updating a film
 type updateFilmRequest struct {
-	Title       string    `json:"title"`
-	Director    string    `json:"director"`
-	ReleaseDate time.Time `json:"releaseDate"`
-	Cast        []string  `json:"cast"`
-	Genre       string    `json:"genre"`
-	Synopsis    string    `json:"synopsis"`
-	CreatorID   uint64    `json:"creatorID"`
+	Title       *string    `json:"title"`
+	Director    *string    `json:"director"`
+	ReleaseDate *time.Time `json:"releaseDate"`
+	Cast        []*string  `json:"cast"`
+	Genre       *string    `json:"genre"`
+	Synopsis    *string    `json:"synopsis"`
+	CreatorID   *uint64    `json:"creatorID"`
 }
 
 // UpdateFilm godoc
@@ -144,7 +144,6 @@ func (h FilmHandler) UpdateFilm(ctx *gin.Context) {
 		Cast:        req.Cast,
 		Genre:       req.Genre,
 		Synopsis:    req.Synopsis,
-		CreatorID:   "d36e1231-abd9-420d-bb12-4b00b59cadc8",
 	}
 
 	film, err := h.svc.UpdateFilm(ctx, filmID, filmUpdateInput)
@@ -226,7 +225,7 @@ func (h *FilmHandler) CreateFilm(ctx *gin.Context) {
 		Director:    req.Director,
 		ReleaseDate: req.ReleaseDate,
 		Cast:        req.Cast,
-		Genre:       req.Genre,
+		Genre:       model.Genre(req.Genre),
 		Synopsis:    req.Synopsis,
 		CreatorID:   payload.UserID,
 	}

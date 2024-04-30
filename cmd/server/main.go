@@ -10,7 +10,6 @@ import (
 	"github.com/behrouz-rfa/kentech/internal/core/services"
 	"github.com/behrouz-rfa/kentech/pkg/logger"
 	"github.com/behrouz-rfa/kentech/pkg/utils/validate"
-	"os"
 )
 
 // @title					KenTech
@@ -31,53 +30,50 @@ import (
 // @name						Authorization
 // @description				Type "Bearer" followed by a space and the access token.
 func main() {
-	// initialize logger
+	// Initialize logger
 	logger.Init()
 	lg := logger.General.Component("main")
 
-	// initialize validate
+	// Initialize validation
 	validate.Init()
 
+	// Load configuration
 	config.Load()
 	cfg := config.Get()
 
+	// Initialize database repository
 	dbRepo, err := mongo.NewRepository(cfg.DbConnectionString(), cfg.Database.Name, config.DbTimeout)
 	if err != nil {
 		lg.WithError(err).Fatal("failed to connect to database")
 	}
+	defer dbRepo.Close()
 
-	auth := auth.NewAuth(cfg.Jwt.Secret)
+	// Initialize authentication service
+	authService := auth.NewAuth(cfg.Jwt.Secret)
 
+	// Initialize services
 	userService := services.NewUserService(
 		services.WithUserRepository(dbRepo),
-		services.WithAuth(auth),
+		services.WithAuth(authService),
 	)
-
 	filmService := services.NewFilmService(
 		services.WithFilmRepository(dbRepo),
 	)
 
+	// Initialize HTTP handlers
 	userHandler := http.NewUserHandler(userService)
 	filmHandler := http.NewFilmHandler(filmService)
 
-	// Init router
-	router, err := http.NewRouter(
-		cfg,
-		auth,
-		*userHandler,
-		*filmHandler,
-	)
+	// Initialize HTTP router
+	router, err := http.NewRouter(cfg, authService, *userHandler, *filmHandler)
 	if err != nil {
-		lg.Error("Error initializing router", "error", err)
-		os.Exit(1)
+		lg.WithError(err).Fatal("failed to initialize router")
 	}
 
-	// Start server
+	// Start HTTP server
 	listenAddr := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
-	lg.Info("Starting the HTTP server", "listen_address", listenAddr)
-	err = router.Serve(listenAddr)
-	if err != nil {
-		lg.Error("Error starting the HTTP server", "error", err)
-		os.Exit(1)
+	lg.WithField("listen_address", listenAddr).Info("Starting HTTP server")
+	if err := router.Serve(listenAddr); err != nil {
+		lg.WithError(err).Fatal("failed to start HTTP server")
 	}
 }
