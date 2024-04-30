@@ -1,0 +1,41 @@
+services:
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    ports:
+      - "27017:27017"
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: root
+      ME_CONFIG_MONGODB_URL: mongodb://root:root@mongo:27017/
+
+  kentech:
+    build:
+      dockerfile: Dockerfile
+    environment:
+      SERVER_PORT: 80
+      SERVER_HOST: localhost
+      GIN_MODE: debug
+      DB_HOST: mongo
+      DB_PORT: 27017
+      DB_NAME: oukoud
+      DB_USER: root
+      DB_PASS: root
+      DB_SSL: false
+      DB_CLUSTERED: false
+      ENV: dev
+      LOG_LEVEL: debug
+      JWT_KEY: "bd32c589-f9cd-479b-9500-a0392b13252b"
+    ports:
+      - "8080:80"
+    depends_on:
+      - mongo
+    restart: always

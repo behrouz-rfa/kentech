@@ -1,0 +1,16 @@
+.idea
+.env.local
+build
+application-build-*
+*.out
+bin/*
+vendor
+docker-compose.override.yml
+
+tmp/*
+
+go.work
+go.work.sum
+
+.vscode/*
+.DS_Store
