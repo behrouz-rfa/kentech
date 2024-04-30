@@ -108,6 +108,19 @@ func (m Repository) DeleteUser(ctx context.Context, id string) error {
 		return cerr.ErrNotFound.Detail("nothing found for delete")
 	}
 
+	return m.deleteUserFilms(ctx, id)
+}
+
+func (m Repository) deleteUserFilms(ctx context.Context, userID string) error {
+	filter := bson.M{"creatorId": userID}
+
+	col := m.filmCollection()
+	_, err := col.DeleteMany(ctx, filter)
+	if err != nil {
+		m.lg.WithError(err).Error("failed to delete films")
+		return cerr.ErrInternalServerError.Detail("failed to delete films")
+	}
+
 	return nil
 }
 
