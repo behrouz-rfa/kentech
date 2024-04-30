@@ -14,7 +14,12 @@ type User struct {
 	Lastname  string    `json:"lastname"`
 	Password  string    `json:"-"`
 	Films     []Film    `json:"films"`
-	JwtToken  string    `json:"jwtToken,omitempty"`
+	JWTToken  *JWTToken `json:"jwtToken,omitempty"`
+}
+
+type JWTToken struct {
+	Token          string    `json:"token"`
+	ExpirationTime time.Time `json:"expirationTime"`
 }
 
 type UserInput struct {

@@ -968,7 +968,7 @@
                     "type": "string"
                 },
                 "jwtToken": {
-                    "type": "string"
+                    "$ref": "#/definitions/model.JWTToken"
                 },
                 "lastname": {
                     "type": "string"
@@ -1041,6 +1041,17 @@
                 "SciFi"
             ]
         },
+        "model.JWTToken": {
+            "type": "object",
+            "properties": {
+                "expirationTime": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
         "model.User": {
             "type": "object",
             "properties": {
@@ -1060,7 +1071,7 @@
                     "type": "string"
                 },
                 "jwtToken": {
-                    "type": "string"
+                    "$ref": "#/definitions/model.JWTToken"
                 },
                 "lastname": {
                     "type": "string"

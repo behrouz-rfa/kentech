@@ -26,8 +26,8 @@ func NewAuth(secret string) *Auth {
 }
 
 // Create generates a new JWT token with the provided user information.
-func (a *Auth) Create(data model.TokenPayload) (string, error) {
-	expirationTime := time.Now().Add(1 * time.Hour)
+func (a *Auth) Create(data model.TokenPayload) (*model.JWTToken, error) {
+	expirationTime := time.Now().Add(3 * time.Hour)
 	claims := &JWTClaim{
 		UserID:   data.UserID,
 		Username: data.Username,
@@ -40,10 +40,10 @@ func (a *Auth) Create(data model.TokenPayload) (string, error) {
 	signedToken, err := token.SignedString([]byte(a.secret))
 	if err != nil {
 		a.lg.WithError(err).Error("failed to sign JWT token")
-		return "", fmt.Errorf("failed to sign JWT token: %w", err)
+		return nil, fmt.Errorf("failed to sign JWT token: %w", err)
 	}
 
-	return signedToken, nil
+	return &model.JWTToken{Token: signedToken, ExpirationTime: expirationTime}, nil
 }
 
 // Verify validates the provided JWT token and returns the user information.

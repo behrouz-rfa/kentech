@@ -115,14 +115,17 @@ func (s *UserService) CreateUser(ctx context.Context, input *model.UserInput) (*
 	if err != nil {
 		return nil, err
 	}
-	user.JwtToken = token
+	user.JWTToken = token
 
 	return user, nil
 }
 
 // Login authenticates a user with the provided login input.
 func (s *UserService) Login(ctx context.Context, input *model.UserLoginInput) (*model.User, error) {
-	user, err := s.GetUser(ctx, filters.UserBy{Username: &input.Username})
+	spec := s.userRepo.NewUserSpecification(ctx).
+		By(filters.UserBy{Username: &input.Username})
+
+	user, err := s.userRepo.GetUser(ctx, spec)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +139,7 @@ func (s *UserService) Login(ctx context.Context, input *model.UserLoginInput) (*
 		return nil, model.ErrInternal
 	}
 
-	user.JwtToken = token
+	user.JWTToken = token
 	return user, nil
 }
 

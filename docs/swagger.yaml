@@ -157,7 +157,7 @@ definitions:
       id:
         type: string
       jwtToken:
-        type: string
+        $ref: '#/definitions/model.JWTToken'
       lastname:
         type: string
       updatedAt:
@@ -208,6 +208,13 @@ definitions:
     - Horror
     - Romance
     - SciFi
+  model.JWTToken:
+    properties:
+      expirationTime:
+        type: string
+      token:
+        type: string
+    type: object
   model.User:
     properties:
       createdAt:
@@ -221,7 +228,7 @@ definitions:
       id:
         type: string
       jwtToken:
-        type: string
+        $ref: '#/definitions/model.JWTToken'
       lastname:
         type: string
       updatedAt:

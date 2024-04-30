@@ -5,6 +5,6 @@ import (
 )
 
 type Auth interface {
-	Create(info model.TokenPayload) (string, error)
+	Create(info model.TokenPayload) (*model.JWTToken, error)
 	Verify(token string) (*model.TokenPayload, error)
 }

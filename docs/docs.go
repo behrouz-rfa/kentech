@@ -971,7 +971,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "jwtToken": {
-                    "type": "string"
+                    "$ref": "#/definitions/model.JWTToken"
                 },
                 "lastname": {
                     "type": "string"
@@ -1044,6 +1044,17 @@ const docTemplate = `{
                 "SciFi"
             ]
         },
+        "model.JWTToken": {
+            "type": "object",
+            "properties": {
+                "expirationTime": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
         "model.User": {
             "type": "object",
             "properties": {
@@ -1063,7 +1074,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "jwtToken": {
-                    "type": "string"
+                    "$ref": "#/definitions/model.JWTToken"
                 },
                 "lastname": {
                     "type": "string"
