@@ -43,7 +43,7 @@ definitions:
       director:
         type: string
       genre:
-        type: string
+        $ref: '#/definitions/model.Genre'
       id:
         type: string
       releaseDate:
@@ -54,6 +54,8 @@ definitions:
         type: string
       updatedAt:
         type: string
+      user:
+        $ref: '#/definitions/model.User'
     type: object
   http.loginRequest:
     properties:
@@ -176,7 +178,7 @@ definitions:
       director:
         type: string
       genre:
-        type: string
+        $ref: '#/definitions/model.Genre'
       id:
         type: string
       releaseDate:
@@ -186,6 +188,45 @@ definitions:
       title:
         type: string
       updatedAt:
+        type: string
+      user:
+        $ref: '#/definitions/model.User'
+    type: object
+  model.Genre:
+    enum:
+    - Action
+    - Comedy
+    - Drama
+    - Horror
+    - Romance
+    - Sci-Fi
+    type: string
+    x-enum-varnames:
+    - Action
+    - Comedy
+    - Drama
+    - Horror
+    - Romance
+    - SciFi
+  model.User:
+    properties:
+      createdAt:
+        type: string
+      films:
+        items:
+          $ref: '#/definitions/model.Film'
+        type: array
+      firstname:
+        type: string
+      id:
+        type: string
+      jwtToken:
+        type: string
+      lastname:
+        type: string
+      updatedAt:
+        type: string
+      username:
         type: string
     type: object
 info:
@@ -215,6 +256,22 @@ paths:
         name: limit
         required: true
         type: integer
+      - description: Genre
+        in: query
+        name: genre
+        type: string
+      - description: Title
+        in: query
+        name: title
+        type: string
+      - description: From
+        in: query
+        name: from
+        type: string
+      - description: To
+        in: query
+        name: to
+        type: string
       produces:
       - application/json
       responses:

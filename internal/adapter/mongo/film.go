@@ -23,6 +23,7 @@ type Film struct {
 	Genre        string    `bson:"genre"`
 	Synopsis     string    `bson:"synopsis"`
 	CreatorID    string    `bson:"creatorId"`
+	User         *User     `bson:"user"`
 }
 
 func (u Film) ToModel() *model.Film {
@@ -37,6 +38,10 @@ func (u Film) ToModel() *model.Film {
 		Genre:       model.Genre(u.Genre),
 		Synopsis:    u.Synopsis,
 		CreatorID:   u.CreatorID,
+	}
+
+	if u.User != nil {
+		s.User = u.User.ToModel()
 	}
 
 	return s

@@ -7,6 +7,7 @@ type FilmBy struct {
 }
 
 type FilmFilter struct {
-	Title     *StringFilter
-	CreatorID *StringFilter
+	Title       *StringFilter
+	Genre       *StringFilter
+	ReleaseDate *TimeRange
 }

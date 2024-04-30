@@ -1,13 +1,13 @@
 package http
 
 import (
+	"github.com/behrouz-rfa/kentech/internal/pagination"
 	"time"
 
 	"github.com/behrouz-rfa/kentech/internal/core/common"
 	"github.com/behrouz-rfa/kentech/internal/core/model"
 	"github.com/behrouz-rfa/kentech/internal/core/ports"
 	"github.com/behrouz-rfa/kentech/internal/filters"
-	"github.com/behrouz-rfa/kentech/internal/pagination"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,8 +25,12 @@ func NewFilmHandler(svc ports.FilmService) *FilmHandler {
 
 // listUsersRequest represents the request body for listing films
 type listFilmsRequest struct {
-	Page  uint64 `form:"page" binding:"required,min=0" example:"0"`
-	Limit uint64 `form:"limit" binding:"required,min=5" example:"10"`
+	Page  uint64     `form:"page" binding:"required,min=0" example:"0"`
+	Limit uint64     `form:"limit" binding:"required,min=5" example:"10"`
+	Title *string    `form:"title" example:"Name of movie"`
+	Genre *string    `form:"genre" example:"Name of genre"`
+	From  *time.Time `form:"from" example:"2021-02-18T21:54:42.123Z"`
+	To    *time.Time `form:"to" example:"2021-02-18T21:54:42.123Z"`
 }
 
 // ListFilms godoc
@@ -38,6 +42,10 @@ type listFilmsRequest struct {
 //	@Produce		json
 //	@Param			page	query		uint64			true	"Page"
 //	@Param			limit	query		uint64			true	"Limit"
+//	@Param			genre	query		string			false	"Genre"
+//	@Param			title	query		string			false	"Title"
+//	@Param			from	query		string		    false	"From"
+//	@Param			to  	query		string		    false	"To"
 //	@Success		200		{object}	meta			"Films displayed"
 //	@Failure		400		{object}	errorResponse	"Validation error"
 //	@Failure		500		{object}	errorResponse	"Internal server error"
@@ -51,8 +59,18 @@ func (h *FilmHandler) ListFilms(ctx *gin.Context) {
 		validationError(ctx, err)
 		return
 	}
+	f := &filters.FilmFilter{}
+	if req.Title != nil {
+		f.Title = &filters.StringFilter{Contains: req.Title}
+	}
+	if req.From != nil {
+		f.ReleaseDate = &filters.TimeRange{From: req.From, To: req.To}
+	}
+	if req.Genre != nil {
+		f.Genre = &filters.StringFilter{Contains: req.Genre}
+	}
 
-	films, err := h.svc.GetFilms(ctx, nil, nil, &pagination.Pagination{
+	films, err := h.svc.GetFilms(ctx, f, nil, &pagination.Pagination{
 		Page:  req.Page,
 		Limit: req.Limit,
 	})
@@ -135,6 +153,8 @@ func (h FilmHandler) UpdateFilm(ctx *gin.Context) {
 		return
 	}
 
+	payload := GetAuthPayload(ctx, common.AuthorizationPayloadKey)
+
 	filmID := ctx.Param("id")
 
 	filmUpdateInput := &model.FilmUpdateInput{
@@ -146,7 +166,7 @@ func (h FilmHandler) UpdateFilm(ctx *gin.Context) {
 		Synopsis:    req.Synopsis,
 	}
 
-	film, err := h.svc.UpdateFilm(ctx, filmID, filmUpdateInput)
+	film, err := h.svc.UpdateFilm(ctx, filmID, filmUpdateInput, payload.UserID)
 	if err != nil {
 		handleError(ctx, err)
 		return

@@ -1,6 +1,7 @@
-## Oukoud Backend
+## Kentech Backend (With Hexagonal Architecture)
 
-This is the backend for the Oukoud project. It is a GraphQL API built with [gqlgen](https://gqlgen.com/) and [gin web framework](), it uses [MongoDB](https://www.mongodb.com/) as the database, and Firebase for authentication.
+This is the backend for the Kentech project. It is a Rest API built with [gin web framework](), it uses [MongoDB](https://www.mongodb.com/) as the database, and Firebase for authentication.
+Support Specification for filer pagination and sort
 
 ### Technologies
 List of the main technologies and tools used in the project:
@@ -34,7 +35,7 @@ GIN_MODE=debug# default:"release"
 # MongoDB Variables
 DB_HOST=localhost
 DB_PORT=27017
-DB_NAME=oukoud
+DB_NAME=kentech
 DB_USER=dbmaster
 DB_PASS=password
 DB_SSL=false

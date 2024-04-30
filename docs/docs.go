@@ -54,6 +54,30 @@ const docTemplate = `{
                         "name": "limit",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Genre",
+                        "name": "genre",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Title",
+                        "name": "title",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "From",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "To",
+                        "name": "to",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -783,7 +807,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "genre": {
-                    "type": "string"
+                    "$ref": "#/definitions/model.Genre"
                 },
                 "id": {
                     "type": "string"
@@ -799,6 +823,9 @@ const docTemplate = `{
                 },
                 "updatedAt": {
                     "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/model.User"
                 }
             }
         },
@@ -976,7 +1003,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "genre": {
-                    "type": "string"
+                    "$ref": "#/definitions/model.Genre"
                 },
                 "id": {
                     "type": "string"
@@ -991,6 +1018,60 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updatedAt": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/model.User"
+                }
+            }
+        },
+        "model.Genre": {
+            "type": "string",
+            "enum": [
+                "Action",
+                "Comedy",
+                "Drama",
+                "Horror",
+                "Romance",
+                "Sci-Fi"
+            ],
+            "x-enum-varnames": [
+                "Action",
+                "Comedy",
+                "Drama",
+                "Horror",
+                "Romance",
+                "SciFi"
+            ]
+        },
+        "model.User": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "films": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Film"
+                    }
+                },
+                "firstname": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "jwtToken": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }

@@ -18,8 +18,8 @@ func (u *FilmSpecification) SortBy(sort *sort.FilmSort) coreSpec.FilmSpecificati
 		return u
 	}
 
-	if sort.Name != nil {
-		u.Sort("name", *sort.Name)
+	if sort.Title != nil {
+		u.Sort("title", *sort.Title)
 	}
 
 	return u
@@ -38,7 +38,28 @@ func (u *FilmSpecification) NeedsPreload(field string) (bool, []bson.M) {
 	if shouldPreload, _ := u.BaseSpecification.NeedsPreload(field); !shouldPreload {
 		return false, nil
 	}
-
+	switch field {
+	case "user":
+		return true, []bson.M{
+			{
+				"$lookup": bson.M{
+					"from":         "users",
+					"localField":   "creatorId",
+					"foreignField": "_id",
+					"as":           "user",
+				},
+			},
+			{
+				"$addFields": bson.M{
+					"user": bson.M{
+						"$arrayElemAt": []interface{}{"$user", 0},
+					},
+				},
+			},
+		}
+	default:
+		return false, nil
+	}
 	return false, nil
 }
 
@@ -58,6 +79,13 @@ func (u *FilmSpecification) Filter(filter *filters.FilmFilter) coreSpec.FilmSpec
 
 	if filter.Title != nil {
 		bsonFilter["title"] = stringFilterBson(*filter.Title)
+	}
+	if filter.Genre != nil {
+		bsonFilter["genre"] = stringFilterBson(*filter.Genre)
+	}
+
+	if filter.ReleaseDate != nil {
+		bsonFilter["releaseDate"] = timeRangeBson(*filter.ReleaseDate)
 	}
 
 	if len(bsonFilter) > 0 {

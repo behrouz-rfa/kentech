@@ -25,6 +25,6 @@ type FilmService interface {
 	GetFilms(ctx context.Context, filter *filters.FilmFilter, sort *sort.FilmSort,
 		paginate *pagination.Pagination) ([]*model.Film, error)
 	CreateFilm(ctx context.Context, filmInput *model.FilmInput) (*model.Film, error)
-	UpdateFilm(ctx context.Context, id string, filmInput *model.FilmUpdateInput) (*model.Film, error)
+	UpdateFilm(ctx context.Context, id string, filmInput *model.FilmUpdateInput, creatorID string) (*model.Film, error)
 	DeleteFilm(ctx context.Context, id string) error
 }

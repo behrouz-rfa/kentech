@@ -27,6 +27,7 @@ type Film struct {
 	Genre       Genre     `json:"genre"`
 	Synopsis    string    `json:"synopsis"`
 	CreatorID   string    `json:"creatorID"`
+	User        *User     `json:"user,omitempty"`
 }
 
 type FilmInput struct {

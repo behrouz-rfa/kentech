@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	errs "github.com/behrouz-rfa/kentech/internal/core/errors"
 	specification "github.com/behrouz-rfa/kentech/internal/core/specefication"
 
 	"github.com/behrouz-rfa/kentech/internal/core/model"
@@ -44,7 +45,8 @@ func NewFilmService(opts ...FilmServiceOption) *FilmService {
 
 // GetFilm retrieves a film by the specified filter.
 func (s *FilmService) GetFilm(ctx context.Context, filter filters.FilmBy) (*model.Film, error) {
-	spec := s.filmRepo.NewFilmSpecification(ctx).By(filter)
+	spec := s.filmRepo.NewFilmSpecification(ctx).
+		By(filter).Prefetch("user").(specification.FilmSpecification)
 	return s.filmRepo.GetFilm(ctx, spec)
 }
 
@@ -67,8 +69,16 @@ func (s *FilmService) CreateFilm(ctx context.Context, input *model.FilmInput) (*
 }
 
 // UpdateFilm updates a film with the provided input.
-func (s *FilmService) UpdateFilm(ctx context.Context, id string, input *model.FilmUpdateInput) (*model.Film, error) {
-	if err := s.filmRepo.UpdateFilm(ctx, id, input); err != nil {
+func (s *FilmService) UpdateFilm(ctx context.Context, id string, filmInput *model.FilmUpdateInput, creatorID string) (*model.Film, error) {
+
+	film, err := s.GetFilm(ctx, filters.FilmBy{ID: &id})
+	if err != nil {
+		return nil, err
+	}
+	if film.CreatorID != creatorID {
+		return nil, errs.ErrForbidden.Detail("you dont have access to edit the film")
+	}
+	if err := s.filmRepo.UpdateFilm(ctx, id, filmInput); err != nil {
 		return nil, err
 	}
 
