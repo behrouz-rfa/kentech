@@ -41,10 +41,10 @@ type FilmInput struct {
 }
 
 type FilmUpdateInput struct {
-	Title       *string    `json:"title"`
-	Director    *string    `json:"director"`
-	ReleaseDate *time.Time `json:"releaseDate"`
-	Cast        []*string  `json:"cast"`
-	Genre       *string    `json:"genre"`
-	Synopsis    *string    `json:"synopsis"`
+	Title       *string   `json:"title"`
+	Director    *string   `json:"director"`
+	ReleaseDate time.Time `json:"releaseDate"`
+	Cast        []*string `json:"cast"`
+	Genre       *string   `json:"genre"`
+	Synopsis    *string   `json:"synopsis"`
 }

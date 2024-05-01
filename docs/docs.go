@@ -759,7 +759,8 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "releaseDate": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2021-02-18"
                 },
                 "synopsis": {
                     "type": "string"
@@ -925,7 +926,8 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "releaseDate": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2021-02-18"
                 },
                 "synopsis": {
                     "type": "string"

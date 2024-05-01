@@ -11,6 +11,7 @@ definitions:
       genre:
         type: string
       releaseDate:
+        example: "2021-02-18"
         type: string
       synopsis:
         type: string
@@ -126,6 +127,7 @@ definitions:
       genre:
         type: string
       releaseDate:
+        example: "2021-02-18"
         type: string
       synopsis:
         type: string

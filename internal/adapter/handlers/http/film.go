@@ -1,14 +1,13 @@
 package http
 
 import (
-	"github.com/behrouz-rfa/kentech/internal/pagination"
-	"time"
-
 	"github.com/behrouz-rfa/kentech/internal/core/common"
 	"github.com/behrouz-rfa/kentech/internal/core/model"
 	"github.com/behrouz-rfa/kentech/internal/core/ports"
 	"github.com/behrouz-rfa/kentech/internal/filters"
+	"github.com/behrouz-rfa/kentech/internal/pagination"
 	"github.com/gin-gonic/gin"
+	"time"
 )
 
 // FilmHandler represents the HTTP handler for film requests
@@ -21,16 +20,6 @@ func NewFilmHandler(svc ports.FilmService) *FilmHandler {
 	return &FilmHandler{
 		svc,
 	}
-}
-
-// listUsersRequest represents the request body for listing films
-type listFilmsRequest struct {
-	Page  uint64     `form:"page" binding:"required,min=0" example:"0"`
-	Limit uint64     `form:"limit" binding:"required,min=5" example:"10"`
-	Title *string    `form:"title" example:"Name of movie"`
-	Genre *string    `form:"genre" example:"Name of genre"`
-	From  *time.Time `form:"from" example:"2021-02-18T21:54:42.123Z"`
-	To    *time.Time `form:"to" example:"2021-02-18T21:54:42.123Z"`
 }
 
 // ListFilms godoc
@@ -64,7 +53,7 @@ func (h *FilmHandler) ListFilms(ctx *gin.Context) {
 		f.Title = &filters.StringFilter{Contains: req.Title}
 	}
 	if req.From != nil {
-		f.ReleaseDate = &filters.TimeRange{From: req.From, To: req.To}
+		f.ReleaseDate = &filters.TimeRange{From: (*time.Time)(req.From), To: (*time.Time)(req.To)}
 	}
 	if req.Genre != nil {
 		f.Genre = &filters.StringFilter{Contains: req.Genre}
@@ -118,17 +107,6 @@ func (h FilmHandler) GetFilm(ctx *gin.Context) {
 	handleSuccess(ctx, rsp)
 }
 
-// updateFilmRequest represents the request body for updating a film
-type updateFilmRequest struct {
-	Title       *string    `json:"title"`
-	Director    *string    `json:"director"`
-	ReleaseDate *time.Time `json:"releaseDate"`
-	Cast        []*string  `json:"cast"`
-	Genre       *string    `json:"genre"`
-	Synopsis    *string    `json:"synopsis"`
-	CreatorID   *uint64    `json:"creatorID"`
-}
-
 // UpdateFilm godoc
 //
 //	@Summary		Update a film
@@ -158,12 +136,15 @@ func (h FilmHandler) UpdateFilm(ctx *gin.Context) {
 	filmID := ctx.Param("id")
 
 	filmUpdateInput := &model.FilmUpdateInput{
-		Title:       req.Title,
-		Director:    req.Director,
-		ReleaseDate: req.ReleaseDate,
-		Cast:        req.Cast,
-		Genre:       req.Genre,
-		Synopsis:    req.Synopsis,
+		Title:    req.Title,
+		Director: req.Director,
+		Cast:     req.Cast,
+		Genre:    req.Genre,
+		Synopsis: req.Synopsis,
+	}
+
+	if req.ReleaseDate != nil {
+		filmUpdateInput.ReleaseDate = (time.Time)(*req.ReleaseDate)
 	}
 
 	film, err := h.svc.UpdateFilm(ctx, filmID, filmUpdateInput, payload.UserID)
@@ -205,16 +186,6 @@ func (h FilmHandler) DeleteFilm(ctx *gin.Context) {
 	handleSuccess(ctx, nil)
 }
 
-// createFilmRequest represents the request body for create a film
-type createFilmRequest struct {
-	Title       string    `json:"title"`
-	Director    string    `json:"director"`
-	ReleaseDate time.Time `json:"releaseDate"`
-	Cast        []string  `json:"cast"`
-	Genre       string    `json:"genre"`
-	Synopsis    string    `json:"synopsis"`
-}
-
 // CreateFilm godoc
 //
 //	@Summary		Create a film
@@ -243,7 +214,7 @@ func (h *FilmHandler) CreateFilm(ctx *gin.Context) {
 	filmUpdateInput := &model.FilmInput{
 		Title:       req.Title,
 		Director:    req.Director,
-		ReleaseDate: req.ReleaseDate,
+		ReleaseDate: time.Time(req.ReleaseDate),
 		Cast:        req.Cast,
 		Genre:       model.Genre(req.Genre),
 		Synopsis:    req.Synopsis,
