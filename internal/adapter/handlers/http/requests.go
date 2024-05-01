@@ -27,7 +27,7 @@ type updateFilmRequest struct {
 type createFilmRequest struct {
 	Title       string   `json:"title"`
 	Director    string   `json:"director"`
-	ReleaseDate DataTime `json:"releaseDate"example:"2021-02-18"`
+	ReleaseDate DataTime `json:"releaseDate" example:"2021-02-18"`
 	Cast        []string `json:"cast"`
 	Genre       string   `json:"genre"`
 	Synopsis    string   `json:"synopsis"`

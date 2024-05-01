@@ -273,11 +273,11 @@ paths:
         in: query
         name: title
         type: string
-      - description: From
+      - description: 'From example: 2021-02-18 '
         in: query
         name: from
         type: string
-      - description: To
+      - description: 'To   example: 2021-02-18 '
         in: query
         name: to
         type: string

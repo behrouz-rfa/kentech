@@ -69,13 +69,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "From",
+                        "description": "From example: 2021-02-18 ",
                         "name": "from",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "To",
+                        "description": "To   example: 2021-02-18 ",
                         "name": "to",
                         "in": "query"
                     }
